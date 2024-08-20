@@ -1,0 +1,179 @@
+BDDA - 1 (Project - 2)
+
+Form Name - 
+Form 16
+
+Bottom Up Approach 
+
+
+
+SUBMITTED TO: PROF. ASHOK HARNAL
+ BATCH: BDA-04
+SECTION: H
+
+
+Group Members -
+Ansh Loomba - 045009
+Lakshit Bhattacharya - 045028
+Nishita Yadav - 045036
+
+
+
+
+
+
+
+
+
+
+
+
+- TO CREATE DATABASE AND TABLES
+-- Create the database
+CREATE DATABASE EmployeeSalary;
+USE EmployeeSalary;
+
+-- Create the Employee table
+CREATE TABLE Employee (
+    EmployeeID INT PRIMARY KEY AUTO_INCREMENT,
+    EmployeeName VARCHAR(100) NOT NULL,
+    EmployeePAN VARCHAR(10) NOT NULL,
+    EmployeeDOB DATE NOT NULL,
+    EmployeeAddress VARCHAR(255) NOT NULL,
+    DepartmentID INT,
+    FOREIGN KEY (DepartmentID) REFERENCES Department(DepartmentID)
+);
+
+-- Create the Employer table
+CREATE TABLE Employer (
+    EmployerID INT PRIMARY KEY AUTO_INCREMENT,
+    EmployerName VARCHAR(100) NOT NULL,
+    EmployerPAN VARCHAR(10) NOT NULL,
+    EmployerAddress VARCHAR(255) NOT NULL,
+    EmployerContact VARCHAR(15) NOT NULL
+);
+
+-- Create the SalaryDetails table
+CREATE TABLE SalaryDetails (
+    SalaryID INT PRIMARY KEY AUTO_INCREMENT,
+    EmployeeID INT,
+    EmployerID INT,
+    GrossSalary DECIMAL(10, 2) NOT NULL,
+    Allowances DECIMAL(10, 2) NOT NULL,
+    Deductions DECIMAL(10, 2) NOT NULL,
+    IncomeChargeable DECIMAL(10, 2) NOT NULL,
+    TaxDeducted DECIMAL(10, 2) NOT NULL,
+    TaxDeposited DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (EmployeeID) REFERENCES Employee(EmployeeID),
+    FOREIGN KEY (EmployerID) REFERENCES Employer(EmployerID)
+);
+
+-- Create the Department table
+CREATE TABLE Department (
+    DepartmentID INT PRIMARY KEY AUTO_INCREMENT,
+    DepartmentName VARCHAR(100) NOT NULL,
+    Location VARCHAR(100) NOT NULL
+);
+
+-- Create the JobTitle table
+CREATE TABLE JobTitle (
+    JobTitleID INT PRIMARY KEY AUTO_INCREMENT,
+    JobTitleName VARCHAR(100) NOT NULL,
+    EmployeeID INT,
+    FOREIGN KEY (EmployeeID) REFERENCES Employee(EmployeeID)
+);
+
+-- Create the TaxDetails table
+CREATE TABLE TaxDetails (
+    TaxID INT PRIMARY KEY AUTO_INCREMENT,
+    SalaryID INT,
+    TaxRate DECIMAL(5, 2) NOT NULL,
+    TaxAmount DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (SalaryID) REFERENCES SalaryDetails(SalaryID)
+);
+
+- TO INSERT VALUES IN THESE TABLES
+-- Insert data into Department table
+INSERT INTO Department (DepartmentName, Location)
+VALUES
+('Human Resources', 'New York'),
+('Finance', 'London'),
+('IT', 'San Francisco'),
+('Sales', 'Chicago');
+
+-- Insert data into Employee table
+INSERT INTO Employee (EmployeeName, EmployeePAN, EmployeeDOB, EmployeeAddress, DepartmentID)
+VALUES
+('John Doe', 'ABCD1234E', '1980-05-15', '123 Elm Street, New York, NY', 1),
+('Jane Smith', 'EFGH5678F', '1985-09-21', '456 Oak Avenue, London, UK', 2),
+('Mark Johnson', 'IJKL9101G', '1990-12-05', '789 Pine Road, San Francisco, CA', 3),
+('Emily Davis', 'MNOP1122H', '1987-03-17', '321 Cedar Blvd, Chicago, IL', 4);
+
+-- Insert data into Employer table
+INSERT INTO Employer (EmployerName, EmployerPAN, EmployerAddress, EmployerContact)
+VALUES
+('XYZ Corp', 'XYZP1234A', '1 Wall Street, New York, NY', '212-555-1234'),
+('ABC Inc', 'ABCP5678B', '100 King Street, London, UK', '020-7946-0958');
+
+-- Insert data into SalaryDetails table
+INSERT INTO SalaryDetails (EmployeeID, EmployerID, GrossSalary, Allowances, Deductions, IncomeChargeable, TaxDeducted, TaxDeposited)
+VALUES
+(1, 1, 120000.00, 15000.00, 10000.00, 105000.00, 21000.00, 21000.00),
+(2, 2, 90000.00, 12000.00, 8000.00, 70000.00, 14000.00, 14000.00),
+(3, 1, 110000.00, 14000.00, 9000.00, 87000.00, 17400.00, 17400.00),
+(4, 2, 95000.00, 13000.00, 8500.00, 73500.00, 14700.00, 14700.00);
+
+-- Insert data into JobTitle table
+INSERT INTO JobTitle (JobTitleName, EmployeeID)
+VALUES
+('HR Manager', 1),
+('Financial Analyst', 2),
+('Software Developer', 3),
+('Sales Executive', 4);
+
+-- Insert data into TaxDetails table
+INSERT INTO TaxDetails (SalaryID, TaxRate, TaxAmount)
+VALUES
+(1, 20.00, 21000.00),
+(2, 20.00, 14000.00),
+(3, 20.00, 17400.00),
+(4, 20.00, 14700.00);
+
+
+
+
+
+
+- TO GIVE ACCESS TO SOME PEOPLE WHO ARE RESPONSIBLE FOR MANIPULATING THE DATA
+-- Create user for HR Manager (John Doe)
+CREATE USER 'hr_manager_john'@'127.0.0.1' IDENTIFIED BY 'password123';
+
+-- Create user for Financial Analyst (Jane Smith)
+CREATE USER 'financial_analyst_jane'@'127.0.0.1' IDENTIFIED BY 'password456';
+
+-- Create user for Software Developer (Mark Johnson)
+CREATE USER 'software_dev_mark'@'127.0.0.1' IDENTIFIED BY 'password789';
+
+-- Create user for Sales Executive (Emily Davis)
+CREATE USER 'sales_exec_emily'@'127.0.0.1' IDENTIFIED BY 'password101';
+
+
+----- John as the HR Manager, should have full control over the Employee and JobTitle tables.
+GRANT SELECT, INSERT, UPDATE, DELETE ON EmployeeSalary.Employee TO 'hr_manager_john'@'127.0.0.1';
+GRANT SELECT, INSERT, UPDATE, DELETE ON EmployeeSalary.JobTitle TO 'hr_manager_john'@'127.0.0.1';
+
+----- Jane as the Financial Analyst, might only need read access to financial data (e.g., SalaryDetails, TaxDetails).
+GRANT SELECT ON EmployeeSalary.SalaryDetails TO 'financial_analyst_jane'@'127.0.0.1';
+GRANT SELECT ON EmployeeSalary.TaxDetails TO 'financial_analyst_jane'@'127.0.0.1';
+
+----- Mark, as a Software Developer, might need access to employee details for certain integrations, with the ability to insert new data.
+GRANT SELECT, INSERT ON EmployeeSalary.Employee TO 'software_dev_mark'@'127.0.0.1';
+
+----- Emily, as a Sales Executive, might need full access to her own information, including salary and tax details.
+GRANT SELECT, INSERT, UPDATE, DELETE ON EmployeeSalary.SalaryDetails TO 'sales_exec_emily'@'127.0.0.1';
+GRANT SELECT, INSERT, UPDATE, DELETE ON EmployeeSalary.TaxDetails TO 'sales_exec_emily'@'127.0.0.1';
+
+FLUSH PRIVILEGES;
+(Mention Diagram name)
+
+
